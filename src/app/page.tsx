@@ -28,12 +28,31 @@ export default function Component() {
 			alert('Please select an image')
 			return
 		}
-		// Here you would typically send the image and caption to your API
-		console.log('Submitting:', { image, caption })
-		// Reset form after submission
-		setImage(null)
-		setCaption('')
-		setPreview(null)
+
+		const formData = new FormData();
+		formData.append('image', image);
+		formData.append('caption', caption);
+
+		try {
+			const response = await fetch('/api/upload', {
+				method: 'POST',
+				body: formData,
+			});
+
+			const result = await response.json();
+			if (result.success) {
+				alert(`Image uploaded successfully! Post ID: ${result.postId}`);
+				// Reset form after submission
+				setImage(null)
+				setCaption('')
+				setPreview(null)
+			} else {
+				alert(`Upload failed: ${result.message}`);
+			}
+		} catch (error) {
+			console.error('Error uploading image:', error);
+			alert('An error occurred. Please try again.');
+		}
 	}
 
 	return (
